@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual y Guía de ZCode — Manuales Codex</title>
+    <meta name="description" content="Guía completa de ZCode: MCP, Skills, Slash Commands, Hooks y Plugins. Documentación práctica con pitfalls y asistente interactivo de diagnóstico.">
+    <meta name="keywords" content="ZCode, MCP, Skills, Commands, Hooks, Plugins, AGENTS.md, diagnóstico, configuración">
+    <meta name="author" content="Codex Portfolio">
+    <meta property="og:title" content="Manual y Guía de ZCode">
+    <meta property="og:description" content="Documentación práctica de los 5 recursos de extensión de ZCode con pitfalls y asistente de diagnóstico.">
+    <meta property="og:type" content="website">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* ──────────────────────────────────────────────────────
+           Estilos complementarios para elementos no cubiertos
+           en el styles.css original
+        ────────────────────────────────────────────────────── */
+
+        /* Layout top-bar */
+        .top-bar {
+            height: var(--header-height);
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 90;
+            backdrop-filter: blur(8px);
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+        .breadcrumb-root { color: var(--text-muted); }
+        .breadcrumb-sep  { color: var(--text-muted); }
+        .breadcrumb-current { color: var(--text-primary); font-weight: 600; }
+        .top-bar-actions { display: flex; align-items: center; gap: 1rem; }
+        .btn-outline {
+            padding: 0.4rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        .btn-outline:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
+
+        /* Mobile toggle button */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+        @media (max-width: 992px) {
+            .mobile-menu-btn { display: block; }
+        }
+
+        /* Content area wrapper */
+        .content-area {
+            padding: 2.5rem;
+            max-width: 1050px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        @media (max-width: 992px) {
+            .content-area { padding: 1.5rem; }
+        }
+
+        /* Brand overrides */
+        .brand-logo {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 800;
+            font-size: 1.05rem;
+            letter-spacing: -0.02em;
+            box-shadow: 0 0 12px rgba(139, 92, 246, 0.45);
+            flex-shrink: 0;
+        }
+        .brand-info { display: flex; flex-direction: column; }
+        .brand-title { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.02em; color: var(--text-primary); line-height: 1.2; }
+        .brand-sub { font-size: 0.72rem; color: var(--accent-cyan); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        /* Search wrapper */
+        .search-wrapper { position: relative; margin-bottom: 0.5rem; }
+        .search-icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.9rem; pointer-events: none; }
+        .search-input {
+            width: 100%;
+            padding: 0.6rem 0.8rem 0.6rem 2.2rem;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            outline: none;
+            transition: var(--transition);
+        }
+        .search-input:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 3px var(--accent-light); }
+
+        /* Progress bar wrapper */
+        .progress-bar-wrapper { margin-top: 0.5rem; }
+        .progress-bar-header { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.4rem; font-weight: 600; }
+        .progress-label { color: var(--text-secondary); }
+        .progress-value { color: var(--accent-primary); }
+        .progress-bar-track { width: 100%; height: 6px; background-color: var(--bg-tertiary); border-radius: 3px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-violet), var(--accent-cyan)); border-radius: 3px; transition: width 0.4s ease; }
+
+        /* Nav group label */
+        .nav-group-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); padding: 0.25rem 0.5rem; margin-bottom: 0.25rem; }
+
+        /* Theme btn */
+        .theme-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.45rem 0.8rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.82rem;
+            font-weight: 500;
+            transition: var(--transition);
+            font-family: inherit;
+            width: 100%;
+        }
+        .theme-btn:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
+
+        /* Section layout */
+        .section-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); }
+        .section-badge { background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan)); color: #fff; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.6rem; border-radius: var(--radius-sm); letter-spacing: 0.04em; flex-shrink: 0; }
+        .section-lead { color: var(--text-secondary); font-size: 1.05rem; line-height: 1.65; margin-bottom: 2rem; }
+
+        /* Hero section */
+        .section-hero {
+            background: linear-gradient(135deg, rgba(99,102,241,0.15) 0%, rgba(6,182,212,0.1) 100%);
+            border: 1px solid rgba(99,102,241,0.25);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem 2rem;
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+        .hero-badge { display: inline-block; background-color: var(--accent-light); border: 1px solid rgba(99,102,241,0.35); color: var(--accent-primary); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.78rem; font-weight: 600; margin-bottom: 1rem; }
+        .section-hero h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.75rem; background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .hero-lead { font-size: 1.1rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6; }
+        .hero-chips { display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap; }
+        .chip { display: inline-block; padding: 0.3rem 0.75rem; border-radius: 20px; font-size: 0.78rem; font-weight: 600; }
+        .chip-violet { background-color: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.35); color: var(--accent-violet); }
+        .chip-cyan { background-color: rgba(6,182,212,0.12); border: 1px solid rgba(6,182,212,0.3); color: var(--accent-cyan); }
+        .chip-emerald { background-color: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); color: var(--accent-emerald); }
+
+        /* Resource grid */
+        .resource-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .resource-card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: left;
+            font-family: inherit;
+            color: inherit;
+            width: 100%;
+        }
+        .resource-card:hover { border-color: var(--accent-primary); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .rc-icon { font-size: 1.6rem; flex-shrink: 0; }
+        .rc-body { flex: 1; min-width: 0; }
+        .rc-title { font-weight: 700; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.2rem; }
+        .rc-desc { font-size: 0.8rem; color: var(--text-secondary); }
+        .rc-arrow { color: var(--text-muted); font-size: 1.1rem; transition: var(--transition); }
+        .resource-card:hover .rc-arrow { color: var(--accent-primary); transform: translateX(3px); }
+
+        /* FAQ */
+        .faq-list { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem; }
+        .faq-item { background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden; transition: var(--transition); }
+        .faq-item summary { padding: 1rem 1.25rem; font-weight: 600; cursor: pointer; color: var(--text-primary); list-style: none; display: flex; align-items: center; gap: 0.5rem; }
+        .faq-item summary::-webkit-details-marker { display: none; }
+        .faq-item summary::before { content: '▶'; font-size: 0.7rem; color: var(--accent-primary); transition: transform 0.2s; flex-shrink: 0; }
+        .faq-item[open] summary::before { transform: rotate(90deg); }
+        .faq-item:hover { border-color: var(--border-hover); }
+        .faq-body { padding: 0 1.25rem 1rem; color: var(--text-secondary); font-size: 0.9rem; }
+        .faq-body ul { padding-left: 1.25rem; margin-top: 0.5rem; }
+        .faq-body li { margin-bottom: 0.3rem; }
+        .faq-body p { margin-bottom: 0.5rem; }
+
+        /* Ordered steps */
+        .ordered-steps { padding-left: 0; list-style: none; counter-reset: steps-counter; margin: 1.25rem 0 1.75rem; }
+        .ordered-steps li { counter-increment: steps-counter; display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.65rem 0; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); font-size: 0.92rem; }
+        .ordered-steps li:last-child { border-bottom: none; }
+        .ordered-steps li::before { content: counter(steps-counter); background-color: var(--accent-primary); color: #fff; font-weight: 800; font-size: 0.72rem; min-width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 0.15rem; }
+
+        /* Pitfall structure overrides (adapting to CSS existing .pitfall) */
+        .pitfall-header { display: flex; align-items: baseline; gap: 0.6rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+        .pitfall-symptom { font-weight: 700; color: var(--text-primary); font-size: 0.95rem; }
+        .pitfall-cause { font-size: 0.87rem; color: var(--accent-rose); margin-bottom: 0.35rem; }
+        .pitfall-fix { font-size: 0.87rem; color: var(--accent-emerald); }
+        .pitfall-cause::before { content: 'Causa: '; font-weight: 700; }
+        .pitfall-fix::before { content: 'Fix: '; font-weight: 700; }
+
+        /* Wizard layout */
+        .wizard-progress { display: flex; align-items: center; margin-bottom: 2rem; }
+        .step-connector { flex: 1; height: 2px; background-color: var(--border-color); }
+        .wizard-step-header { margin-bottom: 1.25rem; }
+        .wizard-step-num { font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent-primary); display: block; margin-bottom: 0.25rem; }
+        .wizard-step-header h3 { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+        .wizard-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.85rem; margin-bottom: 1.75rem; }
+        .option-icon { font-size: 1.5rem; margin-bottom: 0.4rem; }
+        .option-label { font-weight: 700; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.2rem; }
+        .option-hint { font-size: 0.8rem; color: var(--text-secondary); }
+        .wizard-nav { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 1.25rem; gap: 1rem; }
+        .btn-ghost { background: none; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 0.6rem 1.2rem; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.88rem; font-weight: 600; transition: var(--transition); font-family: inherit; }
+        .btn-ghost:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
+
+        /* Wizard result extras */
+        .result-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+        .result-icon { font-size: 2.5rem; }
+        .result-label { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent-primary); display: block; margin-bottom: 0.2rem; }
+        .result-title h3 { font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin: 0; }
+        .result-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
+        .result-chip { display: inline-block; padding: 0.2rem 0.65rem; border-radius: 6px; font-size: 0.78rem; font-weight: 600; }
+        .chip-resource { background-color: var(--accent-light); color: var(--accent-primary); border: 1px solid rgba(99,102,241,0.3); }
+        .chip-skill { background-color: rgba(6,182,212,0.1); color: var(--accent-cyan); border: 1px solid rgba(6,182,212,0.3); }
+        .result-section { margin-bottom: 1rem; }
+        .result-section strong { display: block; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .result-section p { color: var(--text-secondary); font-size: 0.92rem; margin: 0; }
+        .result-fix-list { list-style: none; padding: 0; margin: 0; }
+        .result-fix-list li { background-color: var(--bg-primary); border: 1px solid var(--border-color); border-left: 3px solid var(--accent-emerald); padding: 0.6rem 0.9rem; border-radius: var(--radius-sm); margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.9rem; }
+        .result-footer { border-top: 1px solid var(--border-color); padding-top: 1rem; margin-top: 1rem; }
+
+        /* Path tree extra classes */
+        .path-tree-header { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-violet); margin-bottom: 0.35rem; }
+        .path-entry { padding-left: 1.2rem; margin-bottom: 0.15rem; }
+        .path-user { color: var(--accent-cyan); }
+        .path-workspace { color: var(--accent-emerald); }
+        .path-plugin { color: var(--accent-amber); }
+        .path-config { color: var(--text-secondary); }
+        .path-note { font-size: 0.78em; color: #5c677d; margin-left: 0.5rem; font-style: italic; }
+
+        /* Callout variants using dot notation */
+        .callout-info { border-left-color: var(--accent-cyan); background-color: rgba(6,182,212,0.08); }
+        .callout-warning { border-left-color: var(--accent-amber); background-color: rgba(245,158,11,0.08); }
+        .callout-danger { border-left-color: var(--accent-rose); background-color: rgba(244,63,94,0.08); }
+        .callout-body { font-size: 0.9rem; color: var(--text-secondary); }
+        .callout-body strong { color: var(--text-primary); }
+
+        /* Headings inside sections */
+        .doc-section h2 { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text-primary); margin: 0; }
+        .doc-section h3 { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-top: 2rem; margin-bottom: 0.75rem; }
+        .doc-section p { color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.97rem; line-height: 1.65; }
+        .doc-section ul, .doc-section ol { padding-left: 1.5rem; color: var(--text-secondary); margin-bottom: 1rem; }
+        .doc-section li { margin-bottom: 0.35rem; }
+        .doc-section strong { color: var(--text-primary); }
+
+        /* Completion btn */
+        .completion-btn { margin-top: 3rem; }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     SIDEBAR
+════════════════════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar" aria-label="Navegación principal">
+    <div class="sidebar-header">
+        <div class="brand">
+            <div class="brand-logo" aria-hidden="true">Z</div>
+            <div class="brand-info">
+                <span class="brand-title">ZCode</span>
+                <span class="brand-sub">Manual de Referencia</span>
+            </div>
+        </div>
+
+        <div class="search-wrapper">
+            <span class="search-icon" aria-hidden="true">🔍</span>
+            <input
+                type="search"
+                id="search-input"
+                class="search-input"
+                placeholder="Buscar sección…"
+                aria-label="Buscar en el manual"
+                autocomplete="off"
+            >
+        </div>
+
+        <div class="progress-bar-wrapper" aria-label="Progreso de lectura">
+            <div class="progress-bar-header">
+                <span class="progress-label">Progreso</span>
+                <span class="progress-value" id="progress-val">0%</span>
+            </div>
+            <div class="progress-bar-track">
+                <div class="progress-bar-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Secciones del manual">
+
+        <div class="nav-group" data-group="intro">
+            <div class="nav-group-label">Introducción</div>
+            <button class="nav-item active" data-target="inicio" aria-label="Ir a Inicio">
+                <span class="nav-icon" aria-hidden="true">🏠</span>
+                <span class="nav-text">Inicio y Resumen</span>
+            </button>
+            <button class="nav-item" data-target="conceptos" aria-label="Ir a Conceptos y Scopes">
+                <span class="nav-icon" aria-hidden="true">🧩</span>
+                <span class="nav-text">Conceptos y Scopes</span>
+            </button>
+        </div>
+
+        <div class="nav-group" data-group="recursos">
+            <div class="nav-group-label">Los 5 Recursos</div>
+            <button class="nav-item" data-target="mcp" aria-label="Ir a MCP">
+                <span class="nav-icon" aria-hidden="true">🔌</span>
+                <span class="nav-text">Servidores MCP</span>
+            </button>
+            <button class="nav-item" data-target="skills" aria-label="Ir a Skills">
+                <span class="nav-icon" aria-hidden="true">🧠</span>
+                <span class="nav-text">Skills</span>
+            </button>
+            <button class="nav-item" data-target="commands" aria-label="Ir a Commands">
+                <span class="nav-icon" aria-hidden="true">⚡</span>
+                <span class="nav-text">Slash Commands</span>
+            </button>
+            <button class="nav-item" data-target="hooks" aria-label="Ir a Hooks">
+                <span class="nav-icon" aria-hidden="true">🪝</span>
+                <span class="nav-text">Hooks</span>
+            </button>
+            <button class="nav-item" data-target="plugins" aria-label="Ir a Plugins">
+                <span class="nav-icon" aria-hidden="true">🧩</span>
+                <span class="nav-text">Plugins &amp; Marketplaces</span>
+            </button>
+        </div>
+
+        <div class="nav-group" data-group="instrucciones">
+            <div class="nav-group-label">Instrucciones</div>
+            <button class="nav-item" data-target="agents" aria-label="Ir a AGENTS.md">
+                <span class="nav-icon" aria-hidden="true">📋</span>
+                <span class="nav-text">AGENTS.md</span>
+            </button>
+        </div>
+
+        <div class="nav-group" data-group="herramientas">
+            <div class="nav-group-label">Herramientas</div>
+            <button class="nav-item" data-target="asistente" aria-label="Ir al Asistente">
+                <span class="nav-icon" aria-hidden="true">🩺</span>
+                <span class="nav-text">Asistente Diagnóstico</span>
+            </button>
+        </div>
+
+    </nav>
+
+    <div class="sidebar-footer">
+        <button id="theme-toggle-btn" class="theme-btn" aria-label="Cambiar tema">
+            <span id="theme-icon">🌙</span>
+            <span id="theme-text">Modo Oscuro</span>
+        </button>
+    </div>
+</aside>
+
+<!-- ═══════════════════════════════════════════════════════
+     MAIN LAYOUT
+════════════════════════════════════════════════════════ -->
+<div class="main-wrapper">
+
+    <header class="top-bar" role="banner">
+        <button id="mobile-toggle-btn" class="mobile-menu-btn" aria-label="Abrir menú lateral">☰</button>
+        <nav class="breadcrumb" aria-label="Ruta de navegación">
+            <span class="breadcrumb-root">ZCode Manual</span>
+            <span class="breadcrumb-sep" aria-hidden="true">/</span>
+            <span class="breadcrumb-current" id="current-crumb">Inicio y Resumen</span>
+        </nav>
+        <div class="top-bar-actions">
+            <a href="README.md" class="btn-outline" aria-label="Ver README">README</a>
+        </div>
+    </header>
+
+    <main class="content-area" id="main-content" role="main">
+
+<!-- ═══════════════════════════════════════════════════════
+     SECCIÓN 01 — INICIO
+════════════════════════════════════════════════════════ -->
+<section id="inicio" class="doc-section active" aria-labelledby="h-inicio">
+
+    <div class="section-hero">
+        <div class="hero-badge">ZCode Guide v0.1.0 · Referencia oficial</div>
+        <h1 id="h-inicio">Manual y Guía de ZCode</h1>
+        <p class="hero-lead">Documentación práctica de los <strong>5 recursos de extensión</strong> de ZCode: MCP, Skills, Slash Commands, Hooks y Plugins. Incluye pitfalls reales, flujos de diagnóstico y un asistente interactivo.</p>
+        <div class="hero-chips">
+            <span class="chip chip-violet">5 recursos documentados</span>
+            <span class="chip chip-cyan">HTML5 · Sin dependencias</span>
+            <span class="chip chip-emerald">Español</span>
+        </div>
+    </div>
+
+    <div class="resource-grid">
+        <button class="resource-card" data-target="mcp">
+            <div class="rc-icon">🔌</div>
+            <div class="rc-body">
+                <div class="rc-title">Servidores MCP</div>
+                <div class="rc-desc">Conexiones a herramientas externas vía Model Context Protocol</div>
+            </div>
+            <div class="rc-arrow">→</div>
+        </button>
+        <button class="resource-card" data-target="skills">
+            <div class="rc-icon">🧠</div>
+            <div class="rc-body">
+                <div class="rc-title">Skills</div>
+                <div class="rc-desc">Instrucciones contextuales que el modelo carga automáticamente</div>
+            </div>
+            <div class="rc-arrow">→</div>
+        </button>
+        <button class="resource-card" data-target="commands">
+            <div class="rc-icon">⚡</div>
+            <div class="rc-body">
+                <div class="rc-title">Slash Commands</div>
+                <div class="rc-desc">Atajos de prompt invocables con <code>/nombre</code></div>
+            </div>
+            <div class="rc-arrow">→</div>
+        </button>
+        <button class="resource-card" data-target="hooks">
+            <div class="rc-icon">🪝</div>
+            <div class="rc-body">
+                <div class="rc-title">Hooks</div>
+                <div class="rc-desc">Automatizaciones disparadas por eventos del ciclo de vida</div>
+            </div>
+            <div class="rc-arrow">→</div>
+        </button>
+        <button class="resource-card" data-target="plugins">
+            <div class="rc-icon">🧩</div>
+            <div class="rc-body">
+                <div class="rc-title">Plugins</div>
+                <div class="rc-desc">Paquetes que empaquetan múltiples recursos juntos</div>
+            </div>
+            <div class="rc-arrow">→</div>
+        </button>
+    </div>
+
+    <div class="callout callout-info">
+        <div class="callout-icon">💡</div>
+        <div class="callout-body">
+            <strong>Cómo usar este manual:</strong> Navega por las secciones del sidebar o usa el buscador. Marca cada sección como leída para seguir tu progreso. El Asistente de Diagnóstico te guía cuando algo no funciona.
+        </div>
+    </div>
+
+    <h2 style="font-size:1.3rem;margin-top:2rem;margin-bottom:1rem;">FAQ rápida</h2>
+    <div class="faq-list">
+        <details class="faq-item" id="faq-donde-vivo">
+            <summary>¿Dónde viven los archivos de configuración de ZCode?</summary>
+            <div class="faq-body">
+                <p>Dos ubicaciones principales según el <em>scope</em>:</p>
+                <ul>
+                    <li><strong>User scope</strong> → <code>~/.zcode/cli/config.json</code> — aplica a todos tus workspaces.</li>
+                    <li><strong>Workspace scope</strong> → <code>&lt;repo&gt;/.zcode/config.json</code> (o <code>zcode.json</code>) — versionado en el repo.</li>
+                </ul>
+                <p>Skills y Commands tienen directorios propios dentro de cada scope.</p>
+            </div>
+        </details>
+        <details class="faq-item" id="faq-user-vs-workspace">
+            <summary>¿Cuándo uso user scope vs workspace scope?</summary>
+            <div class="faq-body">
+                <p><strong>User scope</strong> para configuración personal global (herramientas que usas en todos los proyectos). <strong>Workspace scope</strong> para configuración específica del proyecto, versionada y compartida con el equipo.</p>
+                <p>El workspace scope <em>siempre gana</em> sobre el user scope cuando hay conflicto.</p>
+            </div>
+        </details>
+        <details class="faq-item" id="faq-templates">
+            <summary>¿Los <code>${...}</code> se expanden en todos lados?</summary>
+            <div class="faq-body">
+                <p><strong>No.</strong> Las variables <code>${VAR}</code> solo se expanden dentro de los archivos de configuración de <em>plugins</em>. En los archivos <code>config.json</code> de user o workspace scope <strong>no se expanden</strong>; debes usar rutas absolutas.</p>
+            </div>
+        </details>
+        <details class="faq-item" id="faq-precedencia">
+            <summary>¿Cuál es el orden de precedencia cuando hay conflictos?</summary>
+            <div class="faq-body">
+                <p>Para MCP, Hooks y Plugins: <strong>workspace</strong> &gt; <strong>user</strong> &gt; plugin-defaults.</p>
+                <p>Para Skills y Commands (discovery order, el primero gana): <strong>user .zcode</strong> &gt; <strong>user .agents</strong> &gt; <strong>workspace .zcode</strong> &gt; <strong>workspace .agents</strong> &gt; <strong>plugins</strong>.</p>
+            </div>
+        </details>
+    </div>
+
+    <button class="completion-btn" id="btn-complete-inicio" data-section="inicio">✓ Marcar como leída</button>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SECCIÓN 02 — CONCEPTOS Y SCOPES
+════════════════════════════════════════════════════════ -->
+<section id="conceptos" class="doc-section" aria-labelledby="h-conceptos">
+    <div class="section-header">
+        <span class="section-badge">02</span>
+        <h2 id="h-conceptos">Conceptos y Scopes</h2>
+    </div>
+    <p class="section-lead">ZCode organiza toda su configuración en <strong>scopes</strong> (ámbitos). Entender cuáles existen y cómo se resuelven los conflictos evita el 90 % de los problemas de configuración.</p>
+
+    <h3>Los dos scopes principales</h3>
+    <table class="ref-table">
+        <thead>
+            <tr>
+                <th>Scope</th>
+                <th>Directorio raíz</th>
+                <th>Cuándo usar</th>
+                <th>¿Se versiona?</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>User</strong></td>
+                <td><code>~/.zcode/</code></td>
+                <td>Configuración personal, aplica a todos los proyectos</td>
+                <td>No (local)</td>
+            </tr>
+            <tr>
+                <td><strong>Workspace</strong></td>
+                <td><code>&lt;repo&gt;/.zcode/</code></td>
+                <td>Configuración del proyecto, compartida en equipo</td>
+                <td>Sí (en Git)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Archivos de configuración</h3>
+    <div class="path-tree">
+        <div class="path-tree-header">User Scope — ~/.zcode/</div>
+        <div class="path-entry path-user">cli/config.json <span class="path-note">MCP, Hooks, Plugins</span></div>
+        <div class="path-entry path-user">skills/ <span class="path-note">skills personales</span></div>
+        <div class="path-entry path-user">commands/ <span class="path-note">commands personales</span></div>
+        <div class="path-entry path-config">~/.agents/skills/ <span class="path-note">fallback cross-client (Claude, Cursor...)</span></div>
+        <br>
+        <div class="path-tree-header">Workspace Scope — &lt;repo&gt;/</div>
+        <div class="path-entry path-workspace">.zcode/config.json <span class="path-note">o zcode.json</span></div>
+        <div class="path-entry path-workspace">.zcode/skills/</div>
+        <div class="path-entry path-workspace">.zcode/commands/</div>
+        <div class="path-entry path-workspace">.agents/skills/ <span class="path-note">fallback cross-client</span></div>
+        <div class="path-entry path-workspace">.agents/mcp.json <span class="path-note">solo si no hay MCP en .zcode</span></div>
+    </div>
+
+    <h3>Orden de descubrimiento de Skills y Commands</h3>
+    <p>El sistema recorre los directorios en este orden. <strong>El primer archivo que casa gana</strong> (shadowing):</p>
+    <ol class="ordered-steps">
+        <li><code>~/.zcode/skills/</code> — user, formato nativo ZCode</li>
+        <li><code>~/.agents/skills/</code> — user, cross-client</li>
+        <li><code>&lt;repo&gt;/.zcode/skills/</code> — workspace, formato nativo</li>
+        <li><code>&lt;repo&gt;/.agents/skills/</code> — workspace, cross-client</li>
+        <li>Plugins instalados (menor precedencia)</li>
+    </ol>
+
+    <div class="callout callout-warning">
+        <div class="callout-icon">⚠️</div>
+        <div class="callout-body">
+            <strong>Shadowing silencioso:</strong> Si defines una skill en user scope con el mismo nombre que una de un plugin, la tuya gana <em>sin ningún aviso</em>. Para ver qué skill está activa ve a <strong>Settings → Skills</strong>.
+        </div>
+    </div>
+
+    <h3>Resolución de conflictos por recurso</h3>
+    <table class="ref-table">
+        <thead>
+            <tr><th>Recurso</th><th>Estrategia</th><th>Gana</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>MCP Servers</td>
+                <td>Merge por nombre de servidor; workspace sobreescribe user</td>
+                <td>Workspace</td>
+            </tr>
+            <tr>
+                <td>Skills</td>
+                <td>Shadowing: primer archivo en discovery order</td>
+                <td>User .zcode</td>
+            </tr>
+            <tr>
+                <td>Commands</td>
+                <td>Shadowing: igual que skills</td>
+                <td>User .zcode</td>
+            </tr>
+            <tr>
+                <td>Hooks</td>
+                <td>Merge de arrays; se ejecutan todos los que casan</td>
+                <td>Todos activos</td>
+            </tr>
+            <tr>
+                <td>Plugins</td>
+                <td>Namespace único; sin shadowing entre plugins</td>
+                <td>Instalado</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <button class="completion-btn" id="btn-complete-conceptos" data-section="conceptos">✓ Marcar como leída</button>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SECCIÓN 03 — MCP
+════════════════════════════════════════════════════════ -->
+<section id="mcp" class="doc-section" aria-labelledby="h-mcp">
+    <div class="section-header">
+        <span class="section-badge">03</span>
+        <h2 id="h-mcp">Servidores MCP</h2>
+    </div>
+    <p class="section-lead">Model Context Protocol (MCP) conecta ZCode con herramientas externas: bases de datos, APIs, sistemas de archivos y cualquier proceso que implemente el protocolo.</p>
+
+    <h3>Ubicaciones de configuración</h3>
+    <div class="path-tree">
+        <div class="path-entry path-user">~/.zcode/cli/config.json → <code>mcp.servers</code> <span class="path-note">user scope</span></div>
+        <div class="path-entry path-workspace">&lt;repo&gt;/.zcode/config.json → <code>mcp.servers</code> <span class="path-note">workspace</span></div>
+        <div class="path-entry path-workspace">&lt;repo&gt;/.agents/mcp.json <span class="path-note">solo si el workspace scope no define MCP</span></div>
+        <div class="path-entry path-plugin">~/.zcode/cli/plugins/cache/*/plugin.json → <code>mcpServers</code> <span class="path-note">plugins</span></div>
+    </div>
+
+    <h3>Esquema de un servidor MCP</h3>
+    <div class="code-wrapper">
+        <button class="copy-btn" aria-label="Copiar código">📋 Copiar</button>
+        <pre><code>{
+  "mcp": {
+    "servers": {
+      "mi-servidor": {
+        "command": "npx",
+        "args": ["-y", "@mi-org/mcp-server"],
+        "env": {
+          "API_KEY": "valor"
+        },
+        "timeoutMs": 30000,
+        "disabled": false
+      }
+    }
+  }
+}</code></pre>
+    </div>
+
+    <div class="callout callout-danger">
+        <div class="callout-icon">🚨</div>
+        <div class="callout-body">
+            <strong>Campos críticos:</strong> <code>command</code> debe ser un <em>string</em>, no un array. Usa <code>env</code> (no <code>environment</code>) y <code>headers</code> (no <code>http_headers</code>). Una clave desconocida hace que el servidor sea descartado <em>silenciosamente</em>.
+        </div>
+    </div>
+
+    <h3>Pitfalls frecuentes</h3>
+    <ol class="pitfall-list">
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">01</span>
+                <span class="pitfall-symptom">El servidor aparece como <code>failed</code> en Settings → MCP</span>
+            </div>
+            <div class="pitfall-cause">el proceso no arranca o el handshake inicial falla.</div>
+            <div class="pitfall-fix">comprueba que el comando exista en el PATH. Prueba ejecutar el <code>command</code> + <code>args</code> en la terminal para ver el error real.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">02</span>
+                <span class="pitfall-symptom">El servidor no aparece aunque está en el config</span>
+            </div>
+            <div class="pitfall-cause">una clave desconocida en el objeto del servidor descarta toda la entrada.</div>
+            <div class="pitfall-fix">valida el JSON. Campos válidos: <code>command</code>, <code>args</code>, <code>env</code>, <code>url</code>, <code>headers</code>, <code>timeoutMs</code>, <code>disabled</code>.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">03</span>
+                <span class="pitfall-symptom"><code>command</code> definido como array (estilo OpenCode)</span>
+            </div>
+            <div class="pitfall-cause">confusión con otros clientes AI que aceptan <code>command: ["npx", "..."]</code>.</div>
+            <div class="pitfall-fix">separa en <code>"command": "npx"</code> y <code>"args": ["-y", "..."]</code>.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">04</span>
+                <span class="pitfall-symptom">Las variables <code>${VAR}</code> no se expanden en el config</span>
+            </div>
+            <div class="pitfall-cause">la expansión solo ocurre en configs de plugin, no en user/workspace.</div>
+            <div class="pitfall-fix">usa rutas absolutas o variables de entorno del SO.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">05</span>
+                <span class="pitfall-symptom">Timeout al arrancar el servidor</span>
+            </div>
+            <div class="pitfall-cause">el servidor tarda más de 30s en responder el handshake.</div>
+            <div class="pitfall-fix">añade <code>"timeoutMs": 60000</code> (o más) al objeto del servidor.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">06</span>
+                <span class="pitfall-symptom">HTTP server: las cabeceras no se envían</span>
+            </div>
+            <div class="pitfall-cause">uso de <code>http_headers</code> en lugar de <code>headers</code>.</div>
+            <div class="pitfall-fix">renombra a <code>"headers": { "Authorization": "Bearer ..." }</code>.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">07</span>
+                <span class="pitfall-symptom">Variable de entorno no llega al proceso MCP</span>
+            </div>
+            <div class="pitfall-cause">uso de <code>environment</code> en lugar de <code>env</code>.</div>
+            <div class="pitfall-fix">cambia la clave a <code>"env": { ... }</code>.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">08</span>
+                <span class="pitfall-symptom">Servidor funciona en user pero no en workspace</span>
+            </div>
+            <div class="pitfall-cause">el workspace config define el mismo servidor con <code>disabled: true</code> o URL diferente.</div>
+            <div class="pitfall-fix">abre <code>&lt;repo&gt;/.zcode/config.json</code> y verifica el bloque <code>mcp.servers</code>.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">09</span>
+                <span class="pitfall-symptom">JSON inválido en config.json</span>
+            </div>
+            <div class="pitfall-cause">coma extra o comilla sin cerrar.</div>
+            <div class="pitfall-fix">valida con <code>cat config.json | python -m json.tool</code> o usa un editor con linting JSON.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">10</span>
+                <span class="pitfall-symptom">El servidor conecta pero las herramientas no aparecen en el prompt</span>
+            </div>
+            <div class="pitfall-cause">el servidor no exporta herramientas o el handshake de capability está incompleto.</div>
+            <div class="pitfall-fix">consulta los logs del servidor. Verifica que responde al método <code>tools/list</code> de MCP.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">11</span>
+                <span class="pitfall-symptom">Instalación de plugin falla con <code>RPC failed</code></span>
+            </div>
+            <div class="pitfall-cause">proxy corporativo o red restringida sin configurar en ZCode.</div>
+            <div class="pitfall-fix"><code>ZCODE_HTTP_PROXY=http://host:puerto zcode …</code>. La variable <code>http_proxy</code> estándar no se lee.</div>
+        </li>
+    </ol>
+
+    <h3>Workflow de localización de problemas MCP</h3>
+    <ol class="ordered-steps">
+        <li>Abre <strong>Settings → MCP</strong> y lee el estado del servidor: <code>connected</code>, <code>failed</code>, <code>disabled</code> o ausente.</li>
+        <li>Si es <code>failed</code>: ejecuta el <code>command</code> + <code>args</code> en la terminal directamente para ver el error.</li>
+        <li>Si está ausente: valida el JSON del config con un linter y revisa campos desconocidos.</li>
+        <li>Si las herramientas no aparecen: revisa la salida del protocolo MCP (<code>tools/list</code>).</li>
+        <li>Si hay conflicto user vs workspace: abre ambos configs y compara los bloques <code>mcp.servers</code>.</li>
+    </ol>
+
+    <button class="completion-btn" id="btn-complete-mcp" data-section="mcp">✓ Marcar como leída</button>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SECCIÓN 04 — SKILLS
+════════════════════════════════════════════════════════ -->
+<section id="skills" class="doc-section" aria-labelledby="h-skills">
+    <div class="section-header">
+        <span class="section-badge">04</span>
+        <h2 id="h-skills">Skills</h2>
+    </div>
+    <p class="section-lead">Las skills son instrucciones contextuales que el modelo <strong>carga automáticamente</strong> cuando la descripción de la skill es relevante para la tarea en curso. No son comandos explícitos: el modelo decide.</p>
+
+    <div class="callout callout-info">
+        <div class="callout-icon">💡</div>
+        <div class="callout-body">
+            <strong>Cargar ≠ Disparar:</strong> Una skill puede estar <em>cargada</em> (visible en Settings → Skills) pero no <em>disparar</em> si la descripción no es suficientemente descriptiva. El trigger es semántico, no por keyword.
+        </div>
+    </div>
+
+    <h3>Estructura de un SKILL.md</h3>
+    <div class="code-wrapper">
+        <button class="copy-btn" aria-label="Copiar código">📋 Copiar</button>
+        <pre><code>---
+name: mi-skill
+description: |
+  Breve descripción de cuándo usar esta skill (≤ 1024 caracteres).
+  Los primeros ~250 caracteres son los más relevantes para el trigger.
+---
+
+# Instrucciones de la Skill
+
+Contenido completo de las instrucciones para el modelo...</code></pre>
+    </div>
+
+    <h3>Directorios de descubrimiento (en orden)</h3>
+    <div class="path-tree">
+        <div class="path-entry path-user">1. ~/.zcode/skills/&lt;nombre&gt;/SKILL.md</div>
+        <div class="path-entry path-user">2. ~/.agents/skills/&lt;nombre&gt;/SKILL.md</div>
+        <div class="path-entry path-workspace">3. &lt;repo&gt;/.zcode/skills/&lt;nombre&gt;/SKILL.md</div>
+        <div class="path-entry path-workspace">4. &lt;repo&gt;/.agents/skills/&lt;nombre&gt;/SKILL.md</div>
+        <div class="path-entry path-plugin">5. plugins instalados (menor precedencia)</div>
+    </div>
+
+    <h3>Pitfalls frecuentes</h3>
+    <ol class="pitfall-list">
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">01</span>
+                <span class="pitfall-symptom">La skill no aparece en Settings → Skills</span>
+            </div>
+            <div class="pitfall-cause">el frontmatter YAML falta o está mal formado (falta <code>name</code>).</div>
+            <div class="pitfall-fix">añade un bloque <code>---</code> al inicio del SKILL.md con <code>name:</code> y <code>description:</code> obligatorios.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">02</span>
+                <span class="pitfall-symptom">La skill aparece pero nunca dispara</span>
+            </div>
+            <div class="pitfall-cause">descripción vacía, genérica o truncada (límite: 1024 chars).</div>
+            <div class="pitfall-fix">pon el trigger wording en los primeros ~250 caracteres de <code>description</code>. Sé específico.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">03</span>
+                <span class="pitfall-symptom">Mi skill está sombreada por otra</span>
+            </div>
+            <div class="pitfall-cause">tu skill está en <code>.agents/</code> y otra con el mismo nombre está en <code>.zcode/</code> con mayor precedencia.</div>
+            <div class="pitfall-fix">mueve tu skill de <code>~/.agents/skills/</code> a <code>~/.zcode/skills/</code> para ganar la mayor precedencia.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">04</span>
+                <span class="pitfall-symptom">El archivo no se llama exactamente <code>SKILL.md</code></span>
+            </div>
+            <div class="pitfall-cause">el sistema busca el archivo con ese nombre exacto, en mayúsculas.</div>
+            <div class="pitfall-fix">renombra a <code>SKILL.md</code> exactamente. <code>skill.md</code> o <code>Skill.md</code> no se reconocen.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">05</span>
+                <span class="pitfall-symptom">La skill dispara cuando no debería</span>
+            </div>
+            <div class="pitfall-cause">descripción demasiado amplia o genérica.</div>
+            <div class="pitfall-fix">acota la descripción con ejemplos de cuándo <strong>no</strong> usar la skill.</div>
+        </li>
+    </ol>
+
+    <h3>Workflow de diagnóstico de Skills</h3>
+    <ol class="ordered-steps">
+        <li>Abre <strong>Settings → Skills</strong>. Si la skill no aparece → problema de descubrimiento (frontmatter o ubicación).</li>
+        <li>Si aparece pero no dispara → problema de trigger. Mejora los primeros 250 chars de <code>description</code>.</li>
+        <li>Si dispara otro skill en su lugar → shadowing. Comprueba la cadena de discovery.</li>
+        <li>Prueba mencionar explícitamente el skill en el prompt para confirmar que el modelo lo conoce.</li>
+    </ol>
+
+    <button class="completion-btn" id="btn-complete-skills" data-section="skills">✓ Marcar como leída</button>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SECCIÓN 05 — COMMANDS
+════════════════════════════════════════════════════════ -->
+<section id="commands" class="doc-section" aria-labelledby="h-commands">
+    <div class="section-header">
+        <span class="section-badge">05</span>
+        <h2 id="h-commands">Slash Commands</h2>
+    </div>
+    <p class="section-lead">Los slash commands son atajos de prompt almacenados como archivos <code>.md</code>. Se invocan escribiendo <code>/nombre</code> en el chat. El nombre del archivo determina el nombre del comando.</p>
+
+    <h3>Estructura de un comando</h3>
+    <div class="code-wrapper">
+        <button class="copy-btn" aria-label="Copiar código">📋 Copiar</button>
+        <pre><code>---
+description: Genera tests unitarios para el código seleccionado
+---
+
+Por favor genera tests unitarios completos para: $ARGUMENTS
+
+Asegúrate de cubrir casos borde y usar el framework de testing del proyecto.</code></pre>
+    </div>
+
+    <h3>Reglas de nombrado</h3>
+    <table class="ref-table">
+        <thead>
+            <tr><th>Regla</th><th>Ejemplo correcto</th><th>Error común</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Regex: <code>^[a-z0-9][a-z0-9_:-]{0,63}$</code></td>
+                <td><code>review-code.md</code></td>
+                <td><code>Review Code.md</code> ❌</td>
+            </tr>
+            <tr>
+                <td>Subdirectorio → separador <code>:</code></td>
+                <td><code>review/code.md</code> → <code>/review:code</code></td>
+                <td><code>/review/code</code> ❌</td>
+            </tr>
+            <tr>
+                <td>Sin mayúsculas, espacios ni puntos</td>
+                <td><code>generate-tests.md</code></td>
+                <td><code>Generate.Tests.md</code> ❌</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Tokens disponibles en el cuerpo</h3>
+    <table class="ref-table">
+        <thead><tr><th>Token</th><th>Descripción</th></tr></thead>
+        <tbody>
+            <tr><td><code>$ARGUMENTS</code></td><td>Todo el texto escrito tras el nombre del comando</td></tr>
+            <tr><td><code>$1</code>, <code>$2</code>, …</td><td>Argumentos posicionales separados por espacio</td></tr>
+        </tbody>
+    </table>
+
+    <div class="callout callout-warning">
+        <div class="callout-icon">⚠️</div>
+        <div class="callout-body">
+            <strong>Sintaxis incorrecta:</strong> <code>${ARGUMENTS}</code> con llaves <strong>no se reconoce</strong>. Usa <code>$ARGUMENTS</code> (sin llaves).
+        </div>
+    </div>
+
+    <h3>Pitfalls frecuentes</h3>
+    <ol class="pitfall-list">
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">01</span>
+                <span class="pitfall-symptom">El comando no aparece en el menú <code>/</code></span>
+            </div>
+            <div class="pitfall-cause">nombre del archivo con mayúsculas, espacios o caracteres inválidos.</div>
+            <div class="pitfall-fix">renombra siguiendo la regex <code>^[a-z0-9][a-z0-9_:-]{0,63}$</code>.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">02</span>
+                <span class="pitfall-symptom">El comando ejecuta contenido incorrecto</span>
+            </div>
+            <div class="pitfall-cause">otro archivo con el mismo nombre tiene mayor precedencia (shadowing).</div>
+            <div class="pitfall-fix">busca el mismo nombre en todos los directorios de commands. El primero en discovery order gana.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">03</span>
+                <span class="pitfall-symptom">El archivo existe pero el comando se descarta</span>
+            </div>
+            <div class="pitfall-cause">tanto el frontmatter <code>description</code> como el cuerpo están vacíos.</div>
+            <div class="pitfall-fix">añade al menos una <code>description</code> no vacía o un cuerpo con instrucciones.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">04</span>
+                <span class="pitfall-symptom"><code>/review/code</code> no encuentra el comando</span>
+            </div>
+            <div class="pitfall-cause">los subdirectorios usan <strong>dos puntos</strong> como separador, no slash.</div>
+            <div class="pitfall-fix">invoca como <code>/review:code</code>.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">05</span>
+                <span class="pitfall-symptom"><code>${ARGUMENTS}</code> no se expande en el prompt</span>
+            </div>
+            <div class="pitfall-cause">sintaxis incorrecta con llaves <code>${}</code>.</div>
+            <div class="pitfall-fix">usa <code>$ARGUMENTS</code> sin llaves.</div>
+        </li>
+    </ol>
+
+    <button class="completion-btn" id="btn-complete-commands" data-section="commands">✓ Marcar como leída</button>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SECCIÓN 06 — HOOKS
+════════════════════════════════════════════════════════ -->
+<section id="hooks" class="doc-section" aria-labelledby="h-hooks">
+    <div class="section-header">
+        <span class="section-badge">06</span>
+        <h2 id="h-hooks">Hooks</h2>
+    </div>
+    <p class="section-lead">Los hooks son acciones automáticas disparadas por eventos del ciclo de vida de ZCode. Permiten inyectar comportamiento sin modificar skills ni comandos.</p>
+
+    <div class="callout callout-danger">
+        <div class="callout-icon">🚨</div>
+        <div class="callout-body">
+            <strong>Deshabilitados por defecto:</strong> Debes añadir <code>"hooks": { "enabled": true, ... }</code> en el <code>config.json</code>. Sin esto, ningún hook del config se ejecuta.
+        </div>
+    </div>
+
+    <h3>Los 7 eventos de hook</h3>
+    <table class="ref-table">
+        <thead>
+            <tr><th>Evento</th><th>Cuándo se dispara</th><th>Puede bloquear</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>SessionStart</code></td><td>Al iniciar una nueva sesión de ZCode</td><td>No</td></tr>
+            <tr><td><code>UserPromptSubmit</code></td><td>Cuando el usuario envía un mensaje</td><td>Sí</td></tr>
+            <tr><td><code>PreToolUse</code></td><td>Antes de que ZCode ejecute una herramienta</td><td>Sí</td></tr>
+            <tr><td><code>PermissionRequest</code></td><td>Cuando ZCode solicita permiso al usuario</td><td>Sí</td></tr>
+            <tr><td><code>PostToolUse</code></td><td>Tras la ejecución exitosa de una herramienta</td><td>No</td></tr>
+            <tr><td><code>PostToolUseFailure</code></td><td>Tras el fallo de una herramienta</td><td>No</td></tr>
+            <tr><td><code>Stop</code></td><td>Al terminar la sesión o el agente</td><td>No</td></tr>
+        </tbody>
+    </table>
+
+    <h3>Tipos de ejecutor</h3>
+    <table class="ref-table">
+        <thead><tr><th>Tipo</th><th>Clave</th><th>Unidad de timeout</th><th>Uso</th></tr></thead>
+        <tbody>
+            <tr>
+                <td><strong>command</strong></td>
+                <td><code>"command": "bash -c '...'"</code></td>
+                <td><code>timeout</code> en <strong>segundos</strong></td>
+                <td>Scripts shell, Python, linters</td>
+            </tr>
+            <tr>
+                <td><strong>process</strong></td>
+                <td><code>"process": { ... }</code></td>
+                <td><code>timeoutMs</code> en <strong>milisegundos</strong></td>
+                <td>Procesos con comunicación bidireccional</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="callout callout-warning">
+        <div class="callout-icon">⚠️</div>
+        <div class="callout-body">
+            <strong>Trampa de unidades:</strong> <code>timeout: 500</code> en un hook <code>command</code> = <strong>500 segundos</strong>. <code>timeoutMs: 500</code> en un hook <code>process</code> = 500 milisegundos.
+        </div>
+    </div>
+
+    <h3>Ejemplo de hook completo</h3>
+    <div class="code-wrapper">
+        <button class="copy-btn" aria-label="Copiar código">📋 Copiar</button>
+        <pre><code>{
+  "hooks": {
+    "enabled": true,
+    "hooks": [
+      {
+        "event": "PostToolUse",
+        "matcher": "Bash",
+        "command": "echo 'Bash ejecutado' >> ~/.zcode/audit.log",
+        "timeout": 5
+      }
+    ]
+  }
+}</code></pre>
+    </div>
+
+    <h3>Pitfalls frecuentes</h3>
+    <ol class="pitfall-list">
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">01</span>
+                <span class="pitfall-symptom">El hook nunca se dispara</span>
+            </div>
+            <div class="pitfall-cause">falta <code>"enabled": true</code> en el bloque <code>hooks</code> del config.</div>
+            <div class="pitfall-fix">añade <code>"hooks": { "enabled": true, "hooks": [...] }</code> en <code>config.json</code>.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">02</span>
+                <span class="pitfall-symptom">El matcher no casa con la herramienta</span>
+            </div>
+            <div class="pitfall-cause">el matcher es <strong>case-sensitive</strong>. <code>"bash"</code> no casa con <code>Bash</code>.</div>
+            <div class="pitfall-fix">usa el nombre exacto como aparece en los logs (ej. <code>Bash</code>, <code>Edit</code>, <code>Write</code>). Omite el matcher para casar todo.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">03</span>
+                <span class="pitfall-symptom">La sesión se bloquea por un hook</span>
+            </div>
+            <div class="pitfall-cause"><code>timeout: 500</code> significa 500 segundos de espera.</div>
+            <div class="pitfall-fix">usa un valor razonable: <code>timeout: 5</code> para 5 segundos o <code>timeoutMs: 5000</code> en tipo <code>process</code>.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">04</span>
+                <span class="pitfall-symptom">Nombre de evento con mayúsculas incorrectas</span>
+            </div>
+            <div class="pitfall-cause">el sistema de eventos es case-sensitive.</div>
+            <div class="pitfall-fix">usa exactamente uno de los 7 nombres: <code>SessionStart</code>, <code>UserPromptSubmit</code>, <code>PreToolUse</code>, <code>PermissionRequest</code>, <code>PostToolUse</code>, <code>PostToolUseFailure</code>, <code>Stop</code>.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">05</span>
+                <span class="pitfall-symptom">Los hooks de plugin no necesitan <code>enabled: true</code></span>
+            </div>
+            <div class="pitfall-cause">solo los hooks del config.json necesitan el flag. Los de plugins se activan con el plugin.</div>
+            <div class="pitfall-fix">si el hook viene de un plugin, verifica que el plugin esté habilitado en Settings → Plugin Management.</div>
+        </li>
+    </ol>
+
+    <h3>Workflow de diagnóstico de Hooks</h3>
+    <ol class="ordered-steps">
+        <li>Confirma que <code>hooks.enabled: true</code> está en el config del scope correcto.</li>
+        <li>Verifica que el nombre del evento sea exactamente uno de los 7 (case-sensitive).</li>
+        <li>Si el matcher está definido, comprueba que el nombre de la herramienta sea exacto.</li>
+        <li>Si la sesión se bloquea, busca un hook con timeout demasiado alto y corrígelo.</li>
+        <li>Prueba el comando del hook ejecutándolo manualmente en la terminal.</li>
+    </ol>
+
+    <button class="completion-btn" id="btn-complete-hooks" data-section="hooks">✓ Marcar como leída</button>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SECCIÓN 07 — PLUGINS
+════════════════════════════════════════════════════════ -->
+<section id="plugins" class="doc-section" aria-labelledby="h-plugins">
+    <div class="section-header">
+        <span class="section-badge">07</span>
+        <h2 id="h-plugins">Plugins &amp; Marketplaces</h2>
+    </div>
+    <p class="section-lead">Los plugins empaquetan múltiples recursos (skills, commands, hooks, MCP servers) en una unidad reutilizable e instalable. Se gestionan desde <strong>Settings → Plugin Management</strong>.</p>
+
+    <h3>Ciclo de vida de un plugin</h3>
+    <ol class="ordered-steps">
+        <li><strong>Añadir marketplace</strong> → Settings → Plugin Management → Marketplaces → Add.</li>
+        <li><strong>Instalar plugin</strong> → navega el marketplace, pulsa Install. ZCode clona el repo.</li>
+        <li><strong>Habilitar</strong> → pestaña Installed → toggle ON. Los componentes quedan activos.</li>
+        <li><strong>Configurar</strong> → si el plugin tiene <code>userConfig</code>, rellena los campos en la UI.</li>
+        <li><strong>Desinstalar / deshabilitar</strong> → toggle OFF o botón Uninstall.</li>
+    </ol>
+
+    <h3>Estructura de un manifest de plugin</h3>
+    <div class="code-wrapper">
+        <button class="copy-btn" aria-label="Copiar código">📋 Copiar</button>
+        <pre><code>{
+  "name": "mi-plugin",
+  "version": "1.0.0",
+  "description": "Descripción breve",
+  "skills": [
+    { "path": "skills/mi-skill/SKILL.md" }
+  ],
+  "commands": [
+    { "path": "commands/mi-comando.md" }
+  ],
+  "mcpServers": {
+    "servidor-del-plugin": {
+      "command": "npx",
+      "args": ["@mi-org/servidor"],
+      "env": { "TOKEN": "${PLUGIN_TOKEN}" }
+    }
+  },
+  "userConfig": [
+    {
+      "key": "PLUGIN_TOKEN",
+      "description": "Token de autenticación",
+      "required": true
+    }
+  ]
+}</code></pre>
+    </div>
+
+    <div class="callout callout-warning">
+        <div class="callout-icon">⚠️</div>
+        <div class="callout-body">
+            <strong>userConfig con sensitive: true</strong> — actualmente no se puede introducir desde la UI. Quita el campo <code>sensitive</code> o usa una variable de entorno del SO.
+        </div>
+    </div>
+
+    <h3>Pitfalls frecuentes</h3>
+    <ol class="pitfall-list">
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">01</span>
+                <span class="pitfall-symptom">El plugin no aparece en la pestaña Installed</span>
+            </div>
+            <div class="pitfall-cause">el marketplace no fue añadido o la instalación falló silenciosamente.</div>
+            <div class="pitfall-fix">ve a Marketplaces y confirma que el repo esté añadido. Revisa los logs de ZCode.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">02</span>
+                <span class="pitfall-symptom">El plugin está instalado pero sus skills no aparecen</span>
+            </div>
+            <div class="pitfall-cause">el plugin está deshabilitado (toggle OFF).</div>
+            <div class="pitfall-fix">en Settings → Plugin Management → Installed → activa el toggle del plugin.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">03</span>
+                <span class="pitfall-symptom">Instalación falla con <code>RPC failed</code> o <code>timed out</code></span>
+            </div>
+            <div class="pitfall-cause">proxy corporativo o red restringida.</div>
+            <div class="pitfall-fix">ejecuta ZCode con <code>ZCODE_HTTP_PROXY=http://host:puerto</code>. La variable <code>http_proxy</code> estándar no se aplica.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">04</span>
+                <span class="pitfall-symptom"><code>plugins.enabled: false</code> en el config</span>
+            </div>
+            <div class="pitfall-cause">el subsistema de plugins fue desactivado globalmente.</div>
+            <div class="pitfall-fix">abre <code>~/.zcode/cli/config.json</code> y asegúrate de que <code>plugins.enabled</code> sea <code>true</code> o que el campo no exista.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">05</span>
+                <span class="pitfall-symptom"><code>userConfig</code> con <code>sensitive: true</code> no funciona en la UI</span>
+            </div>
+            <div class="pitfall-cause">limitación actual de la interfaz de ZCode.</div>
+            <div class="pitfall-fix">elimina el campo <code>sensitive</code> del userConfig y usa variables de entorno del SO para credenciales sensibles.</div>
+        </li>
+        <li class="pitfall">
+            <div class="pitfall-header">
+                <span class="pitfall-num">06</span>
+                <span class="pitfall-symptom">Un componente del plugin escapa del directorio raíz</span>
+            </div>
+            <div class="pitfall-cause">rutas <code>path</code> en el manifest con <code>../</code> que salen del directorio del plugin.</div>
+            <div class="pitfall-fix">todas las rutas deben ser relativas al root del plugin, sin <code>../</code>.</div>
+        </li>
+    </ol>
+
+    <h3>Workflow de diagnóstico de Plugins</h3>
+    <ol class="ordered-steps">
+        <li>Confirma que <code>plugins.enabled</code> no sea <code>false</code> en <code>~/.zcode/cli/config.json</code>.</li>
+        <li>En <strong>Installed</strong>, confirma que el toggle esté activado.</li>
+        <li>Abre la vista de detalle del plugin para ver componentes y warnings.</li>
+        <li>Si las skills/commands no aparecen, busca shadowing: tu user scope puede estar tapando los del plugin.</li>
+        <li>Si el MCP del plugin no conecta, revisa su bloque <code>mcpServers</code> y las variables del <code>userConfig</code>.</li>
+    </ol>
+
+    <button class="completion-btn" id="btn-complete-plugins" data-section="plugins">✓ Marcar como leída</button>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SECCIÓN 08 — AGENTS.md
+════════════════════════════════════════════════════════ -->
+<section id="agents" class="doc-section" aria-labelledby="h-agents">
+    <div class="section-header">
+        <span class="section-badge">08</span>
+        <h2 id="h-agents">AGENTS.md &amp; Instrucciones</h2>
+    </div>
+    <p class="section-lead"><code>AGENTS.md</code> es el archivo de instrucciones persistentes para el agente. Define el contexto del proyecto, convenciones de código y reglas que el modelo debe seguir en cada sesión.</p>
+
+    <h3>Scopes del AGENTS.md</h3>
+    <table class="ref-table">
+        <thead>
+            <tr><th>Scope</th><th>Ubicación</th><th>Alcance</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>User</strong></td>
+                <td><code>~/.zcode/AGENTS.md</code></td>
+                <td>Aplica a todas las sesiones de ZCode</td>
+            </tr>
+            <tr>
+                <td><strong>Workspace raíz</strong></td>
+                <td><code>&lt;repo&gt;/AGENTS.md</code></td>
+                <td>Aplica al workspace completo</td>
+            </tr>
+            <tr>
+                <td><strong>Subdirectorio</strong></td>
+                <td><code>&lt;repo&gt;/src/AGENTS.md</code></td>
+                <td>Solo cuando el agente trabaja en ese directorio</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Orden de merge</h3>
+    <p>Los archivos AGENTS.md se <strong>concatenan</strong> en este orden (del más general al más específico):</p>
+    <ol class="ordered-steps">
+        <li>User: <code>~/.zcode/AGENTS.md</code></li>
+        <li>Workspace raíz: <code>&lt;repo&gt;/AGENTS.md</code></li>
+        <li>Subdirectorios en profundidad creciente (según el directorio actual de trabajo)</li>
+    </ol>
+
+    <div class="callout callout-info">
+        <div class="callout-icon">💡</div>
+        <div class="callout-body">
+            <strong>Efecto acumulativo:</strong> Las instrucciones se suman, no se sobreescriben. Si tienes reglas conflictivas en user y workspace, el modelo ve ambas. Sé explícito en workspace para anular el user scope.
+        </div>
+    </div>
+
+    <h3>El comando <code>/init</code></h3>
+    <p>Al ejecutar <code>/init</code> en un nuevo workspace, ZCode genera un <code>AGENTS.md</code> con el contexto del proyecto (estructura, stack tecnológico, convenciones detectadas). Puedes editarlo después.</p>
+
+    <h3>Plantilla de AGENTS.md</h3>
+    <div class="code-wrapper">
+        <button class="copy-btn" aria-label="Copiar código">📋 Copiar</button>
+        <pre><code># Mi Proyecto — Instrucciones para ZCode
+
+## Stack Tecnológico
+- Backend: Node.js 20 + Express
+- Frontend: React 18 + TypeScript
+- DB: PostgreSQL 15
+
+## Convenciones de Código
+- Usa siempre `const` en lugar de `let` si no se reasigna.
+- Nombres de funciones en camelCase, clases en PascalCase.
+- Tests con Vitest.
+
+## Reglas Importantes
+- NUNCA commitees credenciales o API keys.
+- Ejecuta `npm test` antes de proponer cambios.
+- El idioma de los comentarios de código es inglés.</code></pre>
+    </div>
+
+    <h3>Migración desde .clinerules / .cursorrules</h3>
+    <p>El contenido de <code>.clinerules</code> o <code>.cursorrules</code> puede copiarse directamente a <code>AGENTS.md</code>. ZCode también puede leer <code>.cursorrules</code> como fallback de compatibilidad, pero <code>AGENTS.md</code> tiene prioridad.</p>
+
+    <button class="completion-btn" id="btn-complete-agents" data-section="agents">✓ Marcar como leída</button>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SECCIÓN 09 — ASISTENTE DE DIAGNÓSTICO
+════════════════════════════════════════════════════════ -->
+<section id="asistente" class="doc-section" aria-labelledby="h-asistente">
+    <div class="section-header">
+        <span class="section-badge">09</span>
+        <h2 id="h-asistente">Asistente de Diagnóstico</h2>
+    </div>
+    <p class="section-lead">El <strong>Doctor de Configuración ZCode</strong> te guía paso a paso hacia la causa del problema y te entrega el skill de diagnóstico correcto con los fixes específicos.</p>
+
+    <!-- Wizard progress dots -->
+    <div class="wizard-progress" aria-label="Progreso del asistente">
+        <div class="step-dot active" id="dot-1" data-step="1">1</div>
+        <div class="step-connector"></div>
+        <div class="step-dot" id="dot-2" data-step="2">2</div>
+        <div class="step-connector"></div>
+        <div class="step-dot" id="dot-3" data-step="3">3</div>
+    </div>
+
+    <!-- PASO 1: Recurso afectado -->
+    <div class="wizard-step active" data-step="1" data-wizard-key="symptom" id="wizard-step-1">
+        <div class="wizard-step-header">
+            <span class="wizard-step-num">Paso 1 de 3</span>
+            <h3>¿Qué recurso tiene el problema?</h3>
+        </div>
+        <div class="wizard-options" role="group" aria-label="Selecciona el recurso afectado">
+            <div class="option-card" data-value="mcp" id="opt-mcp" tabindex="0" role="button">
+                <div class="option-icon">🔌</div>
+                <div class="option-label">Servidor MCP</div>
+                <div class="option-hint">No conecta, herramientas ausentes, timeout</div>
+            </div>
+            <div class="option-card" data-value="skill" id="opt-skill" tabindex="0" role="button">
+                <div class="option-icon">🧠</div>
+                <div class="option-label">Skill</div>
+                <div class="option-hint">No se descubre, no dispara, sombreada</div>
+            </div>
+            <div class="option-card" data-value="command" id="opt-command" tabindex="0" role="button">
+                <div class="option-icon">⚡</div>
+                <div class="option-label">Slash Command</div>
+                <div class="option-hint">Falta en el menú /, ejecuta contenido incorrecto</div>
+            </div>
+            <div class="option-card" data-value="hook" id="opt-hook" tabindex="0" role="button">
+                <div class="option-icon">🪝</div>
+                <div class="option-label">Hook</div>
+                <div class="option-hint">No dispara, bloquea la sesión</div>
+            </div>
+            <div class="option-card" data-value="plugin" id="opt-plugin" tabindex="0" role="button">
+                <div class="option-icon">🧩</div>
+                <div class="option-label">Plugin</div>
+                <div class="option-hint">No aparece, instalación fallida, skills no disponibles</div>
+            </div>
+        </div>
+        <div class="wizard-nav">
+            <span></span>
+            <button class="btn btn-primary btn-next" disabled id="wizard-next-1">Siguiente →</button>
+        </div>
+    </div>
+
+    <!-- PASO 2: Scope -->
+    <div class="wizard-step" data-step="2" data-wizard-key="scope" id="wizard-step-2">
+        <div class="wizard-step-header">
+            <span class="wizard-step-num">Paso 2 de 3</span>
+            <h3>¿En qué scope está configurado?</h3>
+        </div>
+        <div class="wizard-options" role="group" aria-label="Selecciona el scope">
+            <div class="option-card" data-value="user" id="opt-scope-user" tabindex="0" role="button">
+                <div class="option-icon">👤</div>
+                <div class="option-label">User scope</div>
+                <div class="option-hint">Configuración personal global (~/.zcode/)</div>
+            </div>
+            <div class="option-card" data-value="workspace" id="opt-scope-workspace" tabindex="0" role="button">
+                <div class="option-icon">📁</div>
+                <div class="option-label">Workspace scope</div>
+                <div class="option-hint">Configuración del repositorio (.zcode/ en el repo)</div>
+            </div>
+            <div class="option-card" data-value="shared" id="opt-scope-shared" tabindex="0" role="button">
+                <div class="option-icon">🔗</div>
+                <div class="option-label">Shared / Cross-client</div>
+                <div class="option-hint">Directorio .agents/ compartido con Claude, Cursor...</div>
+            </div>
+            <div class="option-card" data-value="plugin" id="opt-scope-plugin" tabindex="0" role="button">
+                <div class="option-icon">🧩</div>
+                <div class="option-label">Plugin instalado</div>
+                <div class="option-hint">Viene de un plugin instalado en ZCode</div>
+            </div>
+        </div>
+        <div class="wizard-nav">
+            <button class="btn-ghost btn-prev" id="wizard-prev-2">← Atrás</button>
+            <button class="btn btn-primary btn-next" disabled id="wizard-next-2">Siguiente →</button>
+        </div>
+    </div>
+
+    <!-- PASO 3: Sospecha -->
+    <div class="wizard-step" data-step="3" data-wizard-key="suspect" id="wizard-step-3">
+        <div class="wizard-step-header">
+            <span class="wizard-step-num">Paso 3 de 3</span>
+            <h3>¿Qué pista tienes del problema?</h3>
+        </div>
+        <div class="wizard-options" role="group" aria-label="Selecciona la pista">
+            <div class="option-card" data-value="json" id="opt-suspect-json" tabindex="0" role="button">
+                <div class="option-icon">📄</div>
+                <div class="option-label">Problema de JSON / config</div>
+                <div class="option-hint">El config.json parece mal formado o tiene claves extrañas</div>
+            </div>
+            <div class="option-card" data-value="trigger" id="opt-suspect-trigger" tabindex="0" role="button">
+                <div class="option-icon">🎯</div>
+                <div class="option-label">Problema de trigger / descripción</div>
+                <div class="option-hint">El recurso aparece pero no se activa cuando debería</div>
+            </div>
+            <div class="option-card" data-value="template" id="opt-suspect-template" tabindex="0" role="button">
+                <div class="option-icon">📝</div>
+                <div class="option-label">Variables ${...} no se expanden</div>
+                <div class="option-hint">Los placeholders aparecen literales en la configuración</div>
+            </div>
+            <div class="option-card" data-value="timeout" id="opt-suspect-timeout" tabindex="0" role="button">
+                <div class="option-icon">⏱️</div>
+                <div class="option-label">Timeout / bloqueo</div>
+                <div class="option-hint">La sesión se congela o el servidor no responde</div>
+            </div>
+            <div class="option-card" data-value="placeholder" id="opt-suspect-placeholder" tabindex="0" role="button">
+                <div class="option-icon">🔤</div>
+                <div class="option-label">Tokens $ARGUMENTS incorrectos</div>
+                <div class="option-hint">Los argumentos del comando no llegan correctamente</div>
+            </div>
+        </div>
+        <div class="wizard-nav">
+            <button class="btn-ghost btn-prev" id="wizard-prev-3">← Atrás</button>
+            <button class="btn btn-primary btn-next" id="wizard-next-3">Ver diagnóstico →</button>
+        </div>
+    </div>
+
+    <!-- Resultado del wizard -->
+    <div class="wizard-result-card" id="wizard-result" style="display: none;" aria-live="polite">
+        <div class="result-header">
+            <div class="result-icon">🩺</div>
+            <div class="result-title">
+                <span class="result-label">Diagnóstico ZCode</span>
+                <h3 id="rec-title">—</h3>
+            </div>
+        </div>
+        <div class="result-meta">
+            <span class="result-chip chip-resource" id="rec-resource"></span>
+            <span class="result-chip chip-skill">Skill: <span id="rec-skill"></span></span>
+            <div class="rec-tags" id="rec-tags"></div>
+        </div>
+        <div class="result-section">
+            <strong>¿Por qué sucede?</strong>
+            <p id="rec-rationale"></p>
+        </div>
+        <div class="result-section">
+            <strong>Pasos a seguir:</strong>
+            <ul class="result-fix-list" id="rec-fix-list"></ul>
+        </div>
+        <div class="result-footer">
+            <button id="reset-wizard-btn" class="btn-ghost">🔄 Nuevo diagnóstico</button>
+        </div>
+    </div>
+
+    <button class="completion-btn" id="btn-complete-asistente" data-section="asistente">✓ Marcar como leída</button>
+</section>
+
+    </main>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
